@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  workout-api
+
+  Sample SAM Template for workout-api
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  WorkoutApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          ThrottlingBurstLimit: 10
+          ThrottlingRateLimit: 5
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'GET,POST,DELETE,PUT,OPTIONS'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt WorkoutUserPool.Arn
+
+  WorkoutTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Workouts
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: workoutId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: workoutId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  CreateWorkoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/create_workout/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WorkoutTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WorkoutTable
+      Events:
+        CreateWorkout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WorkoutApi
+            Path: /workouts
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+  ListWorkoutsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/list_workouts/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WorkoutTable
+      Events:
+        ListWorkouts:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WorkoutApi
+            Path: /workouts
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WorkoutTable
+  DeleteWorkoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/delete_workout/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WorkoutTable
+      Events:
+        DeleteWorkout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WorkoutApi
+            Path: /workouts/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WorkoutTable
+  GetWorkoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get_workout/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WorkoutTable
+      Events:
+        GetWorkout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WorkoutApi
+            Path: /workouts/{id}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WorkoutTable
+  UpdateWorkoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/update_workout/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WorkoutTable
+      Events:
+        UpdateWorkout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WorkoutApi
+            Path: /workouts/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WorkoutTable
+  # Cognito User Pool
+  WorkoutUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: workout-user-pool
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: false
+
+  # Cognito User Pool Client
+  WorkoutUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: workout-app-client
+      UserPoolId: !Ref WorkoutUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+
+Outputs:
+  WorkoutApi:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${WorkoutApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/workouts/"
+  CreateWorkoutFunction:
+    Description: "Create Workout Lambda Function ARN"
+    Value: !GetAtt CreateWorkoutFunction.Arn
+  WorkoutTableName:
+    Description: "DynamoDB table name"
+    Value: !Ref WorkoutTable
+  UserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref WorkoutUserPool
+  UserPoolClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref WorkoutUserPoolClient
