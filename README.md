@@ -89,3 +89,49 @@ workout-app/
 - ユーザー登録・認証（Amazon Cognito）
 - ワークアウト記録の作成・閲覧・更新・削除
 - トレーニング履歴の管理
+
+## CI/CD
+
+GitHub Actionsを使用した自動デプロイを構成しています。
+
+### デプロイフロー
+```
+mainブランチにpush/マージ
+    ↓
+GitHub Actions
+    ├─ フロントエンド → S3にデプロイ
+    └─ バックエンド → SAM経由でLambda/API Gatewayにデプロイ
+```
+
+### 必要なGitHub Secrets
+
+| Secret名 | 説明 |
+|----------|------|
+| `AWS_ROLE_ARN` | フロントエンドデプロイ用OIDCロールのARN |
+| `AWS_ROLE_ARN_BACKEND` | バックエンドデプロイ用OIDCロールのARN |
+| `S3_BUCKET_NAME` | フロントエンドホスティング用S3バケット名 |
+| `SAM_STACK_NAME` | SAMスタック名 |
+| `REACT_APP_API_URL` | API GatewayのエンドポイントURL |
+| `REACT_APP_USER_POOL_ID` | Cognito User Pool ID |
+| `REACT_APP_CLIENT_ID` | Cognito Client ID |
+
+### IAMロール構成
+
+| ロール | 用途 | 主な権限 |
+|--------|------|----------|
+| フロントエンド用OIDC | GitHub ActionsからS3へデプロイ | S3FullAccess |
+| バックエンド用OIDC | GitHub ActionsからSAMデプロイ | Lambda, API Gateway, CloudFormation, S3, Cognito, DynamoDB |
+| Lambda実行ロール | Lambda関数の実行時 | DynamoDB, CloudWatch Logs |
+
+## インフラ構成
+```
+[ユーザー]
+    ↓
+[S3] ← 静的ウェブホスティング (React)
+    ↓
+[API Gateway] ← スロットリング設定
+    ↓ (Cognito認証)
+[Lambda] ← Python 3.9
+    ↓
+[DynamoDB]
+```
