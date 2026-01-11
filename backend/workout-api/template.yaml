@@ -10,6 +10,7 @@ Globals:
   Function:
     Timeout: 3
     MemorySize: 128
+    Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
 
 Resources:
   WorkoutApi:
@@ -59,9 +60,6 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
       Events:
         CreateWorkout:
           Type: Api
@@ -91,9 +89,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref WorkoutTable
   DeleteWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -114,9 +109,6 @@ Resources:
             Method: delete
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
   GetWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -137,9 +129,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref WorkoutTable
   UpdateWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -160,9 +149,6 @@ Resources:
             Method: put
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
   # Cognito User Pool
   WorkoutUserPool:
     Type: AWS::Cognito::UserPool
