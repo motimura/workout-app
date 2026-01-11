@@ -56,12 +56,10 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
       Events:
         CreateWorkout:
           Type: Api
@@ -79,6 +77,7 @@ Resources:
       Runtime: python3.12
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -91,9 +90,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref WorkoutTable
   DeleteWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -102,6 +98,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -114,9 +111,6 @@ Resources:
             Method: delete
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
   GetWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -125,6 +119,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -137,9 +132,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref WorkoutTable
   UpdateWorkoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -148,6 +140,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -160,9 +153,6 @@ Resources:
             Method: put
             Auth:
               Authorizer: CognitoAuthorizer
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref WorkoutTable
   # Cognito User Pool
   WorkoutUserPool:
     Type: AWS::Cognito::UserPool
