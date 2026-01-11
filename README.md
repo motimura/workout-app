@@ -37,6 +37,10 @@ GitHub Actionsを使用した自動デプロイ。mainブランチへのpush時�
 | deploy-frontend.yml | `frontend/**` の変更 | S3 |
 | deploy-backend.yml | `backend/**` の変更 | Lambda/API Gateway (SAM) |
 
+### コードレビュー
+
+CodeRabbitを導入。PRを作成すると自動でAIレビューが実行される。
+
 ### GitHub Secrets
 
 | Secret名 | 説明 |
