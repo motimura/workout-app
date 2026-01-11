@@ -10,7 +10,6 @@ Globals:
   Function:
     Timeout: 3
     MemorySize: 128
-    Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
 
 Resources:
   WorkoutApi:
@@ -57,6 +56,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -77,6 +77,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -97,6 +98,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -117,6 +119,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
@@ -137,6 +140,7 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/workout-lambda-execution-role
       Environment:
         Variables:
           TABLE_NAME: !Ref WorkoutTable
