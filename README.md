@@ -15,6 +15,10 @@
 - Amazon Cognito (ユーザー認証)
 - AWS SAM (デプロイ)
 
+### インフラ管理
+- **Terraform** (インフラ基盤: DynamoDB, S3, Cognito)
+- **AWS SAM** (サーバーレス: Lambda, API Gateway)
+
 ## インフラ構成
 ```
 [ユーザー]
@@ -61,6 +65,33 @@ CodeRabbitを導入。PRを作成すると自動でAIレビューが実行され
 | バックエンド用OIDC | GitHub ActionsからSAMデプロイ | Lambda, API Gateway, CloudFormation, S3, Cognito, DynamoDB |
 | Lambda実行ロール | Lambda関数の実行時 | DynamoDB, CloudWatch Logs |
 
+## Terraform（インフラ基盤管理）
+
+DynamoDB、S3、CognitoなどのインフラリソースはTerraformで管理。
+
+### 管理対象リソース
+- **DynamoDB**: Workoutsテーブル
+- **S3**: フロントエンドホスティング用バケット
+- **Cognito**: User Pool & Client
+- **S3**: Terraform state保存用バケット（暗号化・バージョニング有効）
+
+### State管理
+- S3バックエンド使用
+- バケット名: `workout-app-terraform-state-saitoh`
+- 暗号化・バージョニング有効
+
+### ハイブリッド構成
+```
+Terraform（インフラ基盤）:
+├─ DynamoDB
+├─ S3
+└─ Cognito
+
+SAM（アプリケーション層）:
+├─ Lambda関数
+└─ API Gateway
+```
+
 ## プロジェクト構成
 ```
 workout-app/
@@ -71,7 +102,11 @@ workout-app/
 │   ├── src/
 │   │   └── api/       # API通信とCognito認証
 │   └── .env.example
-└── backend/workout-api/
-    ├── template.yaml  # SAMテンプレート
-    └── src/           # Lambda関数群
+├── backend/workout-api/
+│   ├── template.yaml  # SAMテンプレート
+│   └── src/           # Lambda関数群
+└── terraform/         # インフラ定義
+    ├── main.tf        # リソース定義
+    ├── variables.tf   # 変数定義
+    └── outputs.tf     # 出力定義
 ```
