@@ -234,7 +234,7 @@ npm start             # http://localhost:3000
 ```
 
 `.env` に以下を設定:
-```
+```text
 REACT_APP_API_URL=<API GatewayエンドポイントURL>
 REACT_APP_USER_POOL_ID=<Cognito User Pool ID>
 REACT_APP_CLIENT_ID=<Cognito Client ID>
@@ -286,7 +286,7 @@ DynamoDB、S3、CognitoなどのインフラリソースはTerraformで管理。
 - 暗号化・バージョニング有効
 
 ### ハイブリッド構成
-```
+```text
 Terraform（インフラ基盤）:
 ├─ DynamoDB
 ├─ S3
@@ -299,7 +299,7 @@ SAM（アプリケーション層）:
 
 ## プロジェクト構成
 
-```
+```text
 workout-app/
 ├── .github/workflows/
 │   ├── deploy-frontend.yml    # フロントエンド自動デプロイ

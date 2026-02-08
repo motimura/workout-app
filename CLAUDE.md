@@ -14,7 +14,7 @@ AWS サーバーレスアーキテクチャで構築した個人開発プロジ�
 - CI/CD: GitHub Actions
 
 ## ディレクトリ構成
-```
+```text
 workout-app/
 ├── .github/workflows/  # CI/CDパイプライン
 ├── backend/workout-api/ # Lambda関数（Python）
