@@ -87,6 +87,5 @@ GitHub Actionsでmainブランチへのpush時に自動デプロイ:
 - `.env`ファイルはGit管理外。`.env.example`を参照して作成
 - AWS認証情報はコードに含めない
 - DynamoDBのテーブル名は環境変数`TABLE_NAME`で指定
+- リソース名（S3バケット名、Cognitoプール名など）はコードやドキュメントにハードコードしない
 
-## GitHub Secrets
-`AWS_ROLE_ARN`, `AWS_ROLE_ARN_BACKEND`, `S3_BUCKET_NAME`, `SAM_STACK_NAME`, `REACT_APP_API_URL`, `REACT_APP_USER_POOL_ID`, `REACT_APP_CLIENT_ID`

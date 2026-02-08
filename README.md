@@ -72,6 +72,21 @@ graph TB
 | **SAM** | Lambda・API Gateway・DynamoDB・Cognitoのデプロイ管理 |
 | **Terraform** | S3・DynamoDB・Cognitoなど共有リソースのコード管理 |
 
+### SAMとTerraformのハイブリッド構成
+
+```text
+Terraform（インフラ基盤）:
+├─ DynamoDB
+├─ S3
+└─ Cognito
+
+SAM（アプリケーション層）:
+├─ Lambda関数
+└─ API Gateway
+```
+
+TerraformのstateはS3バックエンドで管理（暗号化・バージョニング有効）。
+
 ## 技術選定の理由
 
 ### なぜサーバーレスか
@@ -205,14 +220,22 @@ graph LR
 ## 今後の改善予定
 
 - CloudFront導入によるCDN配信とHTTPS対応
-- ワークアウト統計ダッシュボード（種目別ボリューム推移グラフなど）の追加
-- エクササイズマスタの導入（よく使う種目の選択式入力）
 - バックエンドのユニットテスト・統合テスト拡充
-- フロントエンドのレスポンシブデザイン改善
-- Terraform管理範囲の拡大（API Gateway、Lambda関数もTerraformで管理）
-- エラーハンドリングの強化（フロントエンドでのユーザーフレンドリーなエラー表示）
+- ワークアウト統計ダッシュボード（種目別ボリューム推移グラフなど）の追加
 
 ---
+
+## 技術スタック
+
+| カテゴリ | 技術 | バージョン |
+|---------|------|----------|
+| フロントエンド | React | 19.2.3 |
+| 認証SDK | amazon-cognito-identity-js | 6.3.16 |
+| バックエンドランタイム | Python | 3.9 |
+| IaC (バックエンド) | AWS SAM | - |
+| IaC (インフラ) | Terraform | AWS Provider ~> 5.0 |
+| CI/CD | GitHub Actions | - |
+| コードレビュー | CodeRabbit | - |
 
 ## セットアップ手順
 
@@ -256,45 +279,6 @@ cd terraform
 terraform init
 terraform plan
 terraform apply
-```
-
-## 技術スタック
-
-| カテゴリ | 技術 | バージョン |
-|---------|------|----------|
-| フロントエンド | React | 19.2.3 |
-| 認証SDK | amazon-cognito-identity-js | 6.3.16 |
-| バックエンドランタイム | Python | 3.9 |
-| IaC (バックエンド) | AWS SAM | - |
-| IaC (インフラ) | Terraform | AWS Provider ~> 5.0 |
-| CI/CD | GitHub Actions | - |
-| コードレビュー | CodeRabbit | - |
-
-## Terraform（インフラ基盤管理）
-
-DynamoDB、S3、CognitoなどのインフラリソースはTerraformで管理。
-
-### 管理対象リソース
-- **DynamoDB**: Workoutsテーブル
-- **S3**: フロントエンドホスティング用バケット
-- **Cognito**: User Pool & Client
-- **S3**: Terraform state保存用バケット（暗号化・バージョニング有効）
-
-### State管理
-- S3バックエンド使用
-- バケット名: `workout-app-terraform-state-saitoh`
-- 暗号化・バージョニング有効
-
-### ハイブリッド構成
-```text
-Terraform（インフラ基盤）:
-├─ DynamoDB
-├─ S3
-└─ Cognito
-
-SAM（アプリケーション層）:
-├─ Lambda関数
-└─ API Gateway
 ```
 
 ## プロジェクト構成
