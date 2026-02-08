@@ -270,6 +270,33 @@ terraform apply
 | CI/CD | GitHub Actions | - |
 | コードレビュー | CodeRabbit | - |
 
+## Terraform（インフラ基盤管理）
+
+DynamoDB、S3、CognitoなどのインフラリソースはTerraformで管理。
+
+### 管理対象リソース
+- **DynamoDB**: Workoutsテーブル
+- **S3**: フロントエンドホスティング用バケット
+- **Cognito**: User Pool & Client
+- **S3**: Terraform state保存用バケット（暗号化・バージョニング有効）
+
+### State管理
+- S3バックエンド使用
+- バケット名: `workout-app-terraform-state-saitoh`
+- 暗号化・バージョニング有効
+
+### ハイブリッド構成
+```
+Terraform（インフラ基盤）:
+├─ DynamoDB
+├─ S3
+└─ Cognito
+
+SAM（アプリケーション層）:
+├─ Lambda関数
+└─ API Gateway
+```
+
 ## プロジェクト構成
 
 ```
